@@ -37,6 +37,7 @@ from .const import (
     PARIS_TIME_ZONE,
 )
 from .coordinator import EdfTempoDataUpdateCoordinator
+from .effective import EffectiveTempoTracker
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,9 +103,13 @@ async def async_setup_entry(
 ) -> None:
     """Set up EDF Tempo sensors from a config entry."""
     coordinator: EdfTempoDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities(
-        EdfTempoSensor(coordinator, entry, description) for description in SENSORS
-    )
+    # 3/4) Deux capteurs supplémentaires : couleur effective et origine de sa décision.
+    tracker = EffectiveTempoTracker(hass, entry, coordinator)
+    async_add_entities([
+        *(EdfTempoSensor(coordinator, entry, description) for description in SENSORS),
+        EffectiveTempoSensor(tracker, entry, "edf_tempo"),
+        EffectiveTempoSensor(tracker, entry, "edf_tempo_source"),
+    ])
 
 
 class EdfTempoSensor(CoordinatorEntity[EdfTempoDataUpdateCoordinator], SensorEntity):
@@ -275,3 +280,29 @@ class EdfTempoSensor(CoordinatorEntity[EdfTempoDataUpdateCoordinator], SensorEnt
                 ATTR_RED_TOTAL: 0,
             }
         return {**season_dates, "used_days": 0, "total_days": 0}
+
+
+class EffectiveTempoSensor(SensorEntity):
+    """3) Couleur effective à l’heure configurée ; 4) source RTE ou Lixee."""
+
+    _attr_has_entity_name = False
+
+    def __init__(self, tracker: EffectiveTempoTracker, entry: ConfigEntry, key: str) -> None:
+        self.tracker = tracker
+        self.key = key
+        self._attr_unique_id = f"{entry.entry_id}_{key}"
+        self._attr_name = key
+
+    @property
+    def native_value(self) -> str | None:
+        return self.tracker.color if self.key == "edf_tempo" else self.tracker.source
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        self.tracker.subscribe(self.async_write_ha_state)
+        self.async_on_remove(lambda: self.tracker.unsubscribe(self.async_write_ha_state))
+        await self.tracker.async_start()
+
+    async def async_will_remove_from_hass(self) -> None:
+        await super().async_will_remove_from_hass()
+        await self.tracker.async_stop_if_unused()
