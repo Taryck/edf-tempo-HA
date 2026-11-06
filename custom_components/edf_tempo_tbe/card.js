@@ -1,7 +1,7 @@
 /*
- * EDF Tempo Lovelace card
+ * EDF Tempo Rev TBE Lovelace card
  *
- * The EDF Tempo integration exposes and registers this module automatically.
+ * The EDF Tempo Rev TBE integration exposes and registers this module automatically.
  * Use type: custom:edf-tempo-card, type: custom:edf-tempo-season-card,
  *    type: custom:edf-tempo-season-calendar-card or type: custom:edf-tempo-month-card
  */
@@ -9,7 +9,7 @@
 const EDF_TEMPO_CARD_TRANSLATIONS = {
   en: {
     blue_days: "Blue days",
-    calendar_title: "EDF Tempo Calendar",
+    calendar_title: "EDF Tempo Rev TBE Calendar",
     columns: "Columns",
     display_days: "Days to display",
     display_days_both: "Today and tomorrow",
@@ -28,7 +28,7 @@ const EDF_TEMPO_CARD_TRANSLATIONS = {
     load_month_failed: "Failed to load month data",
     load_season_failed: "Failed to load season data",
     month_help: "This card automatically uses the displayed month and navigation arrows.",
-    monthly_title: "EDF Tempo Monthly",
+    monthly_title: "EDF Tempo Rev TBE Monthly",
     next: "Next",
     previous: "Previous",
     red_days: "Red days",
@@ -43,7 +43,7 @@ const EDF_TEMPO_CARD_TRANSLATIONS = {
   },
   fr: {
     blue_days: "Jours bleus",
-    calendar_title: "Calendrier EDF Tempo",
+    calendar_title: "Calendrier EDF Tempo Rev TBE",
     columns: "Colonnes",
     display_days: "Jours à afficher",
     display_days_both: "Aujourd’hui et demain",
@@ -62,7 +62,7 @@ const EDF_TEMPO_CARD_TRANSLATIONS = {
     load_month_failed: "Impossible de charger les données du mois",
     load_season_failed: "Impossible de charger les données de la saison",
     month_help: "Cette carte utilise automatiquement le mois affiché et les flèches de navigation.",
-    monthly_title: "EDF Tempo mensuel",
+    monthly_title: "EDF Tempo Rev TBE mensuel",
     next: "Suivant",
     previous: "Précédent",
     red_days: "Jours rouges",
@@ -122,7 +122,7 @@ async function edfTempoLoadEntityPicker() {
   try {
     await edfTempoEntityPickerLoading;
   } catch (error) {
-    console.warn("EDF Tempo: entity picker loading failed; using text inputs.", error);
+    console.warn("EDF Tempo Rev TBE: entity picker loading failed; using text inputs.", error);
   }
 }
 
@@ -194,7 +194,7 @@ class EdfTempoCardEditor extends HTMLElement {
   setConfig(config) {
     const nextConfig = {
       type: "custom:edf-tempo-card",
-      title: config.title || "EDF Tempo",
+      title: config.title || "EDF Tempo Rev TBE",
       today_entity: this._resolveTodayEntity(config.today_entity),
       tomorrow_entity: this._resolveTomorrowEntity(config.tomorrow_entity),
       columns: edfTempoDailyColumns(config.columns),
@@ -345,13 +345,13 @@ class EdfTempoCardEditor extends HTMLElement {
 
   _resolveTodayEntity(entityId) {
     return this._resolveEntity(entityId, [
-      "sensor.edf_tempo_today",
+      "sensor.edf_tempo_tbe_today",
     ]);
   }
 
   _resolveTomorrowEntity(entityId) {
     return this._resolveEntity(entityId, [
-      "sensor.edf_tempo_tomorrow",
+      "sensor.edf_tempo_tbe_tomorrow",
     ]);
   }
 
@@ -404,9 +404,9 @@ class EdfTempoCard extends HTMLElement {
   static getStubConfig() {
     return {
       type: "custom:edf-tempo-card",
-      title: "EDF Tempo",
-      today_entity: "sensor.edf_tempo_today",
-      tomorrow_entity: "sensor.edf_tempo_tomorrow",
+      title: "EDF Tempo Rev TBE",
+      today_entity: "sensor.edf_tempo_tbe_today",
+      tomorrow_entity: "sensor.edf_tempo_tbe_tomorrow",
       columns: 2,
       display_days: "both",
     };
@@ -430,7 +430,7 @@ class EdfTempoCard extends HTMLElement {
 
     this._config = {
       type: "custom:edf-tempo-card",
-      title: config.title || "EDF Tempo",
+      title: config.title || "EDF Tempo Rev TBE",
       today_entity: todayEntity,
       tomorrow_entity: tomorrowEntity,
       columns: edfTempoDailyColumns(config.columns),
@@ -473,13 +473,13 @@ class EdfTempoCard extends HTMLElement {
 
   _resolveTodayEntity(entityId) {
     return this._resolveEntity(entityId, [
-      "sensor.edf_tempo_today",
+      "sensor.edf_tempo_tbe_today",
     ]);
   }
 
   _resolveTomorrowEntity(entityId) {
     return this._resolveEntity(entityId, [
-      "sensor.edf_tempo_tomorrow",
+      "sensor.edf_tempo_tbe_tomorrow",
     ]);
   }
 
@@ -1051,7 +1051,7 @@ class EdfTempoSeasonCardEditor extends HTMLElement {
 
   _resolveSeasonEntity(entityId) {
     return this._resolveEntity(entityId, [
-      "sensor.edf_tempo_season_summary",
+      "sensor.edf_tempo_tbe_season_summary",
     ]);
   }
 
@@ -1093,7 +1093,7 @@ class EdfTempoSeasonCard extends HTMLElement {
     return {
       type: "custom:edf-tempo-season-card",
       title: edfTempoCardText(null, "season_summary_title"),
-      entity: "sensor.edf_tempo_season_summary",
+      entity: "sensor.edf_tempo_tbe_season_summary",
     };
   }
 
@@ -1133,7 +1133,7 @@ class EdfTempoSeasonCard extends HTMLElement {
     }
 
     const candidates = [
-      "sensor.edf_tempo_season_summary",
+      "sensor.edf_tempo_tbe_season_summary",
     ];
     for (const candidate of candidates) {
       if (this._hass?.states?.[candidate]) {
@@ -1253,7 +1253,7 @@ class EdfTempoSeasonCard extends HTMLElement {
       <ha-card>
         <div class="card">
           <div class="title">${this._escapeHtml(this._config.title)}</div>
-          <div class="subtitle">EDF Tempo</div>
+          <div class="subtitle">EDF Tempo Rev TBE</div>
           <div class="season">${this._escapeHtml(model.seasonLabel)}</div>
           ${
             model.available
@@ -1653,7 +1653,7 @@ class EdfTempoSeasonCalendarCard extends HTMLElement {
     const loadPromise = Promise.resolve()
       .then(() =>
         this._hass.connection.sendMessagePromise({
-          type: "edf_tempo/get_season_calendar",
+          type: "edf_tempo_tbe/get_season_calendar",
           season_start_year: seasonStartYear,
         }),
       )
@@ -2190,7 +2190,7 @@ class EdfTempoMonthCard extends HTMLElement {
     const loadPromise = Promise.resolve()
       .then(() =>
         this._hass.connection.sendMessagePromise({
-          type: "edf_tempo/get_season_calendar",
+          type: "edf_tempo_tbe/get_season_calendar",
           season_start_year: seasonStartYear,
         }),
       )
@@ -2624,10 +2624,10 @@ window.customCards = window.customCards || [];
 if (!window.customCards.find((card) => card.type === "edf-tempo-card")) {
   window.customCards.push({
     type: "edf-tempo-card",
-    name: edfTempoPickerIsFrench ? "EDF Tempo Quotidien" : "EDF Tempo Daily",
+    name: edfTempoPickerIsFrench ? "EDF Tempo Rev TBE Quotidien" : "EDF Tempo Rev TBE Daily",
     description: edfTempoPickerIsFrench
-      ? "Affiche les couleurs EDF Tempo d'aujourd'hui et de demain."
-      : "Displays EDF Tempo colors for today and tomorrow.",
+      ? "Affiche les couleurs EDF Tempo Rev TBE d'aujourd'hui et de demain."
+      : "Displays EDF Tempo Rev TBE colors for today and tomorrow.",
     preview: true,
   });
 }
@@ -2635,10 +2635,10 @@ if (!window.customCards.find((card) => card.type === "edf-tempo-card")) {
 if (!window.customCards.find((card) => card.type === "edf-tempo-season-card")) {
   window.customCards.push({
     type: "edf-tempo-season-card",
-    name: edfTempoPickerIsFrench ? "EDF Tempo Synthèse Saison" : "EDF Tempo Season Summary",
+    name: edfTempoPickerIsFrench ? "EDF Tempo Rev TBE Synthèse Saison" : "EDF Tempo Rev TBE Season Summary",
     description: edfTempoPickerIsFrench
-      ? "Affiche la synthèse de la saison EDF Tempo en cours."
-      : "Displays the current EDF Tempo season summary.",
+      ? "Affiche la synthèse de la saison EDF Tempo Rev TBE en cours."
+      : "Displays the current EDF Tempo Rev TBE season summary.",
     preview: true,
   });
 }
@@ -2646,10 +2646,10 @@ if (!window.customCards.find((card) => card.type === "edf-tempo-season-card")) {
 if (!window.customCards.find((card) => card.type === "edf-tempo-season-calendar-card")) {
   window.customCards.push({
     type: "edf-tempo-season-calendar-card",
-    name: edfTempoPickerIsFrench ? "Calendrier EDF Tempo" : "EDF Tempo Season Calendar",
+    name: edfTempoPickerIsFrench ? "Calendrier EDF Tempo Rev TBE" : "EDF Tempo Rev TBE Season Calendar",
     description: edfTempoPickerIsFrench
-      ? "Affiche le calendrier complet d'une saison EDF Tempo avec navigation."
-      : "Displays a full EDF Tempo season calendar with navigation.",
+      ? "Affiche le calendrier complet d'une saison EDF Tempo Rev TBE avec navigation."
+      : "Displays a full EDF Tempo Rev TBE season calendar with navigation.",
     preview: true,
   });
 }
@@ -2657,10 +2657,10 @@ if (!window.customCards.find((card) => card.type === "edf-tempo-season-calendar-
 if (!window.customCards.find((card) => card.type === "edf-tempo-month-card")) {
   window.customCards.push({
     type: "edf-tempo-month-card",
-    name: edfTempoPickerIsFrench ? "EDF Tempo Mensuel" : "EDF Tempo Monthly",
+    name: edfTempoPickerIsFrench ? "EDF Tempo Rev TBE Mensuel" : "EDF Tempo Rev TBE Monthly",
     description: edfTempoPickerIsFrench
-      ? "Affiche le calendrier mensuel EDF Tempo avec navigation par mois."
-      : "Displays the monthly EDF Tempo calendar with month navigation.",
+      ? "Affiche le calendrier mensuel EDF Tempo Rev TBE avec navigation par mois."
+      : "Displays the monthly EDF Tempo Rev TBE calendar with month navigation.",
     preview: true,
   });
 }

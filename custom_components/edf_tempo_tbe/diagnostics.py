@@ -1,4 +1,4 @@
-"""Diagnostics support for the EDF Tempo integration."""
+"""Diagnostics support for the EDF Tempo Rev TBE integration."""
 
 from __future__ import annotations
 

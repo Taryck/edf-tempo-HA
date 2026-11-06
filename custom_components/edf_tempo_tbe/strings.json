@@ -1,5 +1,5 @@
 {
-  "title": "EDF Tempo",
+  "title": "EDF Tempo Rev TBE",
   "services": {
     "clear_cache": {
       "name": "Clear season cache",
@@ -9,15 +9,15 @@
   "config": {
     "step": {
       "user": {
-        "title": "Set up EDF Tempo",
-        "description": "Enter the OAuth2 credentials generated for the official EDF Tempo API.",
+        "title": "Set up EDF Tempo Rev TBE",
+        "description": "Enter the OAuth2 credentials generated for the official EDF Tempo Rev TBE API.",
         "data": {
           "client_id": "Client ID",
           "client_secret": "Client secret"
         }
       },
       "reauth_confirm": {
-        "title": "Reconnect EDF Tempo",
+        "title": "Reconnect EDF Tempo Rev TBE",
         "description": "Authentication failed. Update the OAuth2 credentials to continue using the integration.",
         "data": {
           "client_id": "Client ID",
@@ -25,8 +25,8 @@
         }
       },
       "reconfigure": {
-        "title": "Reconfigure EDF Tempo",
-        "description": "Update the OAuth2 credentials used to access the official EDF Tempo API. Leave the client secret empty to keep the existing secret.",
+        "title": "Reconfigure EDF Tempo Rev TBE",
+        "description": "Update the OAuth2 credentials used to access the official EDF Tempo Rev TBE API. Leave the client secret empty to keep the existing secret.",
         "data": {
           "client_id": "Client ID",
           "client_secret": "Client secret"
@@ -34,14 +34,14 @@
       }
     },
     "error": {
-      "already_configured": "EDF Tempo is already configured",
-      "cannot_connect": "Unable to connect to the EDF Tempo API",
+      "already_configured": "EDF Tempo Rev TBE is already configured",
+      "cannot_connect": "Unable to connect to the EDF Tempo Rev TBE API",
       "invalid_auth": "Invalid client ID or client secret",
       "unknown": "Unexpected error",
       "access_denied": "Access to the Tempo API was denied. Check your RTE application's permissions and Tempo API subscription."
     },
     "abort": {
-      "already_configured": "EDF Tempo is already configured",
+      "already_configured": "EDF Tempo Rev TBE is already configured",
       "reauth_successful": "Credentials updated successfully",
       "reconfigure_successful": "Configuration updated successfully"
     }

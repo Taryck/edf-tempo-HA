@@ -1,4 +1,4 @@
-"""API client for EDF Tempo."""
+"""API client for EDF Tempo Rev TBE."""
 
 from __future__ import annotations
 
@@ -26,11 +26,11 @@ COLOR_LABELS: dict[str, str] = {
 
 
 class EdfTempoError(Exception):
-    """Base exception for the EDF Tempo client."""
+    """Base exception for the EDF Tempo Rev TBE client."""
 
 
 class EdfTempoAuthError(EdfTempoError):
-    """Raised when authentication with the EDF Tempo API fails."""
+    """Raised when authentication with the EDF Tempo Rev TBE API fails."""
 
 
 class EdfTempoAccessError(EdfTempoAuthError):
@@ -38,12 +38,12 @@ class EdfTempoAccessError(EdfTempoAuthError):
 
 
 class EdfTempoApiError(EdfTempoError):
-    """Raised when the EDF Tempo API returns an unexpected response."""
+    """Raised when the EDF Tempo Rev TBE API returns an unexpected response."""
 
 
 @dataclass(frozen=True, slots=True)
 class TempoDayData:
-    """Normalized day data from the EDF Tempo API."""
+    """Normalized day data from the EDF Tempo Rev TBE API."""
 
     date: str
     color_code: str | None
@@ -87,7 +87,7 @@ class TempoDayWindowData:
 
 
 class EdfTempoClient:
-    """Async client for the official EDF Tempo API."""
+    """Async client for the official EDF Tempo Rev TBE API."""
 
     def __init__(
         self,
@@ -113,7 +113,7 @@ class EdfTempoClient:
 
     async def async_get_tempo_days(self) -> TempoDayWindowData:
         """Fetch today and tomorrow Tempo colors."""
-        _LOGGER.debug("Fetching EDF Tempo day window for today and tomorrow")
+        _LOGGER.debug("Fetching EDF Tempo Rev TBE day window for today and tomorrow")
         token = await self._async_get_access_token()
         now_paris = datetime.now(PARIS_TIME_ZONE)
         today = now_paris.date()
@@ -159,7 +159,7 @@ class EdfTempoClient:
     ) -> dict[str, str]:
         """Fetch and parse all known color days for a season."""
         _LOGGER.debug(
-            "Fetching EDF Tempo season day colors for %s to %s",
+            "Fetching EDF Tempo Rev TBE season day colors for %s to %s",
             season_start.isoformat(),
             season_end.isoformat(),
         )
@@ -241,10 +241,10 @@ class EdfTempoClient:
                 except (ValueError, UnicodeDecodeError) as err:
                     raise EdfTempoApiError("Token response contained invalid JSON") from err
         except asyncio.TimeoutError as err:
-            _LOGGER.warning("EDF Tempo token request timed out")
+            _LOGGER.warning("EDF Tempo Rev TBE token request timed out")
             raise EdfTempoApiError("Token request timed out") from err
         except aiohttp.ClientError as err:
-            _LOGGER.warning("EDF Tempo token request failed: %s", err)
+            _LOGGER.warning("EDF Tempo Rev TBE token request failed: %s", err)
             raise EdfTempoApiError(f"Token request failed: {err}") from err
 
         if not isinstance(payload, dict):
@@ -316,10 +316,10 @@ class EdfTempoClient:
 
                 return payload
         except asyncio.TimeoutError as err:
-            _LOGGER.warning("EDF Tempo API request timed out for %s %s", method, url)
+            _LOGGER.warning("EDF Tempo Rev TBE API request timed out for %s %s", method, url)
             raise EdfTempoApiError("API request timed out") from err
         except aiohttp.ClientError as err:
-            _LOGGER.warning("EDF Tempo API request failed for %s %s: %s", method, url, err)
+            _LOGGER.warning("EDF Tempo Rev TBE API request failed for %s %s: %s", method, url, err)
             raise EdfTempoApiError(f"API request failed: {err}") from err
 
     def _parse_day_window_response(
@@ -414,7 +414,7 @@ class EdfTempoClient:
 
     @staticmethod
     def _format_api_datetime(value: datetime) -> str:
-        """Format a timezone-aware datetime for the EDF Tempo API."""
+        """Format a timezone-aware datetime for the EDF Tempo Rev TBE API."""
         return value.isoformat(timespec="seconds")
 
     @staticmethod

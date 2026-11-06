@@ -1,24 +1,24 @@
-title: EDF Tempo
+title: EDF Tempo Rev TBE
 views:
   - title: Tempo
     path: tempo
     cards:
       - type: grid
-        title: EDF Tempo
+        title: EDF Tempo Rev TBE
         columns: 2
         square: false
         cards:
           - type: entity
-            entity: sensor.edf_tempo_today
+            entity: sensor.edf_tempo_tbe_today
             name: Aujourd'hui
           - type: entity
-            entity: sensor.edf_tempo_tomorrow
+            entity: sensor.edf_tempo_tbe_tomorrow
             name: Demain
 
       - type: custom:edf-tempo-card
-        title: EDF Tempo
-        today_entity: sensor.edf_tempo_today
-        tomorrow_entity: sensor.edf_tempo_tomorrow
+        title: EDF Tempo Rev TBE
+        today_entity: sensor.edf_tempo_tbe_today
+        tomorrow_entity: sensor.edf_tempo_tbe_tomorrow
         columns: 2
         display_days: both
         update_info: hidden

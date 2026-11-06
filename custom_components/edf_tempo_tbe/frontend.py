@@ -1,4 +1,4 @@
-"""Automatic frontend resource registration for EDF Tempo cards."""
+"""Automatic frontend resource registration for EDF Tempo Rev TBE cards."""
 
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ async def async_register_frontend(hass: HomeAssistant) -> None:
     resources = _get_storage_resources(hass)
     if resources is None:
         _LOGGER.warning(
-            "Lovelace resources are unavailable; EDF Tempo card registration will be retried"
+            "Lovelace resources are unavailable; EDF Tempo Rev TBE card registration will be retried"
         )
         return
     await resources.async_get_info()
@@ -78,7 +78,7 @@ async def async_register_frontend(hass: HomeAssistant) -> None:
 
 
 async def async_remove_frontend_resource(hass: HomeAssistant) -> None:
-    """Remove EDF Tempo Lovelace resources after final entry removal."""
+    """Remove EDF Tempo Rev TBE Lovelace resources after final entry removal."""
     resources = _get_storage_resources(hass)
     if resources is None:
         return
@@ -95,6 +95,6 @@ async def async_remove_frontend_resource(hass: HomeAssistant) -> None:
 
     if resource_ids:
         _LOGGER.debug(
-            "Removed %s EDF Tempo Lovelace resources",
+            "Removed %s EDF Tempo Rev TBE Lovelace resources",
             len(resource_ids),
         )

@@ -1,5 +1,5 @@
 {
-  "title": "EDF Tempo",
+  "title": "EDF Tempo Rev TBE",
   "services": {
     "clear_cache": {
       "name": "Vider le cache des saisons",
@@ -9,15 +9,15 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configurer EDF Tempo",
-        "description": "Saisissez les identifiants OAuth2 générés pour l'API officielle EDF Tempo.",
+        "title": "Configurer EDF Tempo Rev TBE",
+        "description": "Saisissez les identifiants OAuth2 générés pour l'API officielle EDF Tempo Rev TBE.",
         "data": {
           "client_id": "Identifiant client",
           "client_secret": "Secret client"
         }
       },
       "reauth_confirm": {
-        "title": "Reconnecter EDF Tempo",
+        "title": "Reconnecter EDF Tempo Rev TBE",
         "description": "L'authentification a échoué. Mettez à jour les identifiants OAuth2 pour continuer à utiliser l'intégration.",
         "data": {
           "client_id": "Identifiant client",
@@ -25,8 +25,8 @@
         }
       },
       "reconfigure": {
-        "title": "Reconfigurer EDF Tempo",
-        "description": "Mettez à jour les identifiants OAuth2 utilisés pour accéder à l'API officielle EDF Tempo. Laissez le client secret vide pour conserver le secret actuel.",
+        "title": "Reconfigurer EDF Tempo Rev TBE",
+        "description": "Mettez à jour les identifiants OAuth2 utilisés pour accéder à l'API officielle EDF Tempo Rev TBE. Laissez le client secret vide pour conserver le secret actuel.",
         "data": {
           "client_id": "Identifiant client",
           "client_secret": "Secret client"
@@ -34,14 +34,14 @@
       }
     },
     "error": {
-      "already_configured": "EDF Tempo est déjà configuré",
-      "cannot_connect": "Impossible de se connecter à l'API EDF Tempo",
+      "already_configured": "EDF Tempo Rev TBE est déjà configuré",
+      "cannot_connect": "Impossible de se connecter à l'API EDF Tempo Rev TBE",
       "invalid_auth": "Identifiant client ou secret client invalide",
       "unknown": "Erreur inattendue",
       "access_denied": "Accès à l’API Tempo refusé. Vérifiez les droits de votre application RTE et la souscription à l'API Tempo."
     },
     "abort": {
-      "already_configured": "EDF Tempo est déjà configuré",
+      "already_configured": "EDF Tempo Rev TBE est déjà configuré",
       "reauth_successful": "Identifiants mis à jour avec succès",
       "reconfigure_successful": "Configuration mise à jour avec succès"
     }
