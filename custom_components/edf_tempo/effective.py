@@ -10,21 +10,37 @@ from .const import (
     DEFAULT_LIXEE_LOCK_HOURS, DEFAULT_TEMPO_SWITCH_TIME, PARIS_TIME_ZONE,
 )
 
-COLORS = {"BLUE": "blue", "WHITE": "white", "RED": "red"}
-NTARF = {"1": "blue", "2": "blue", "3": "white", "4": "white", "5": "red", "6": "red"}
+# Couleurs Tempo utilisées par les deux sources.
+COULEURS = ("Bleu", "Blanc", "Rouge")
 
+# Correspondance des index tarifaires NTARF :
+# 1/2 = Bleu, 3/4 = Blanc, 5/6 = Rouge (HC/HP).
+NTARF = {
+    "1": "Bleu",
+    "2": "Bleu",
+    "3": "Blanc",
+    "4": "Blanc",
+    "5": "Rouge",
+    "6": "Rouge",
+}
+
+# Sources possibles de la couleur Tempo effective.
+RTE = "rte"
+LIXEE = "lixee"
 
 def lixee_color(state):
     """2) Reconnaître la couleur, sans confondre HP/HC avec un changement de jour."""
     if state is None or state.state in ("unknown", "unavailable"):
         return None
     value = state.state.strip().upper().replace(" ", "")
+    # NTARF : index numérique.
     if value in NTARF:
         return NTARF[value]
-    for name, color in (("BLEU", "blue"), ("BLUE", "blue"), ("BLANC", "white"),
-                        ("WHITE", "white"), ("ROUGE", "red"), ("RED", "red")):
-        if name in value:
-            return color
+
+    # LTARF : libellé contenant la couleur française.
+    for couleur in COULEURS:
+        if couleur.upper() in value:
+            return couleur
     return None
 
 
@@ -90,13 +106,13 @@ class EffectiveTempoTracker:
             # 3) Pas de couleur RTE pour ce jour : unknown, jamais l'ancienne couleur.
             color = self._rte_color(day)
             self._pending = color is None
-            self._set(color, "rte" if color else None)
+            self._set(color, RTE if color else None)
         elif self._pending:
             # Une annonce RTE tardive reprend toujours la priorité.
             color = self._rte_color(day)
             if color:
                 self._pending = False
-                self._set(color, "rte")
+                self._set(color, RTE)
 
     @callback
     def _on_rte_update(self):
@@ -116,7 +132,7 @@ class EffectiveTempoTracker:
         new = lixee_color(event.data.get("new_state"))
         if old is None or new is None or old == new:
             return
-        self._set(new, "lixee")
+        self._set(new, LIXEE)
         self._lock_until = now + timedelta(hours=int(self.entry.options.get(
             CONF_LIXEE_LOCK_HOURS, DEFAULT_LIXEE_LOCK_HOURS)))
 
