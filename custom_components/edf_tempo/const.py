@@ -17,6 +17,15 @@ INTEGRATION_VERSION = "1.2.12"
 CONF_CLIENT_ID = "client_id"
 CONF_CLIENT_SECRET = "client_secret"
 
+# 1) Heure de bascule tarifaire RTE (heure locale Europe/Paris).
+CONF_TEMPO_SWITCH_TIME = "tempo_switch_time"
+DEFAULT_TEMPO_SWITCH_TIME = "06:00"
+# 2) Entités LTARF/NTARF de N Lixee, surveillées simultanément.
+CONF_LIXEE_ENTITIES = "lixee_entities"
+# 3) Le premier changement Lixee bloque les suivants (12 h par défaut).
+CONF_LIXEE_LOCK_HOURS = "lixee_lock_hours"
+DEFAULT_LIXEE_LOCK_HOURS = 12
+
 PLATFORMS = ["sensor"]
 
 DEFAULT_NAME = "EDF Tempo"
