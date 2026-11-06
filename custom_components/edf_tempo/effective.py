@@ -41,6 +41,7 @@ class EffectiveTempoTracker:
         self._lock_until = None
         self._listeners = set()
         self._unsub = []
+        self._unsub_switch = None
         self._started = False
         self._pending = False
 
@@ -129,7 +130,9 @@ class EffectiveTempoTracker:
         target = datetime.combine(now.date(), self._switch_time(), tzinfo=PARIS_TIME_ZONE)
         if target <= now:
             target = datetime.combine(now.date() + timedelta(days=1), self._switch_time(), tzinfo=PARIS_TIME_ZONE)
-        self._unsub.append(async_track_point_in_time(self.hass, self._on_switch, target))
+        if self._unsub_switch is not None:
+            self._unsub_switch()
+        self._unsub_switch = async_track_point_in_time(self.hass, self._on_switch, target)
 
     async def async_start(self):
         if self._started:
@@ -150,4 +153,7 @@ class EffectiveTempoTracker:
         for unsub in self._unsub:
             unsub()
         self._unsub.clear()
+        if self._unsub_switch is not None:
+            self._unsub_switch()
+            self._unsub_switch = None
         self._started = False
