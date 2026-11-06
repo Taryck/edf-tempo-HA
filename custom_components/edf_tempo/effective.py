@@ -156,15 +156,14 @@ class EffectiveTempoTracker:
         now = datetime.now(PARIS_TIME_ZONE)
         if self._rte_decision is None or self._rte_decision != (now.date(), None):
             return
-        if self._lock_until is not None and now < self._lock_until:
+        if self._lixee_first is not None:
             return
         ancien = lixee_color(event.data.get("old_state"))
         nouveau = lixee_color(event.data.get("new_state"))
         if nouveau is None or ancien == nouveau:
             return
         # La date est celle de l'événement reçu, jamais celle de la dernière valeur.
-        if self._lixee_first is None:
-            self._lixee_first = (now, nouveau)
+        self._lixee_first = (now, nouveau)
         if self._current_day(now) == now.date():
             self._apply_day()
             self._set(nouveau, LIXEE)
