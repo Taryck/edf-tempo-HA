@@ -1,4 +1,4 @@
-"""Data coordinator for the EDF Tempo integration."""
+"""Data coordinator for the EDF Tempo Rev TBE integration."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ API_RETRY_INTERVAL = timedelta(minutes=5)
 
 
 class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
-    """Coordinate EDF Tempo API updates."""
+    """Coordinate EDF Tempo Rev TBE API updates."""
 
     def __init__(
         self,
@@ -66,33 +66,33 @@ class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
         """Validate credentials before the first refresh."""
         try:
             await self.client.async_validate_credentials()
-            _LOGGER.debug("EDF Tempo credentials validated successfully")
+            _LOGGER.debug("EDF Tempo Rev TBE credentials validated successfully")
         except EdfTempoAuthError as err:
-            _LOGGER.warning("EDF Tempo authentication failed during coordinator setup")
+            _LOGGER.warning("EDF Tempo Rev TBE authentication failed during coordinator setup")
             self.config_entry.async_start_reauth(self.hass)
             raise UpdateFailed(f"Unable to authenticate with RTE: {err}") from err
         except EdfTempoApiError as err:
-            _LOGGER.warning("EDF Tempo credential validation failed: %s", err)
+            _LOGGER.warning("EDF Tempo Rev TBE credential validation failed: %s", err)
             raise UpdateFailed(f"Unable to validate credentials: {err}") from err
 
     async def _async_update_data(self) -> TempoCalendarData:
-        """Fetch data from the EDF Tempo API."""
+        """Fetch data from the EDF Tempo Rev TBE API."""
         self._refresh_started_after_failure = not self.last_update_success
         # DataUpdateCoordinator keeps the last successful payload after an
         # update failure. Reuse it so the recovery refresh can still detect a
         # publication change and restore the correct window schedule.
         previous_data = self.data
-        _LOGGER.debug("Refreshing EDF Tempo coordinator data")
+        _LOGGER.debug("Refreshing EDF Tempo Rev TBE coordinator data")
         try:
             day_window = await self.client.async_get_tempo_days()
         except EdfTempoAuthError as err:
             self.update_interval = API_RETRY_INTERVAL
-            _LOGGER.warning("EDF Tempo authentication failed during data refresh")
+            _LOGGER.warning("EDF Tempo Rev TBE authentication failed during data refresh")
             self.config_entry.async_start_reauth(self.hass)
             raise UpdateFailed(f"Unable to authenticate with RTE: {err}") from err
         except EdfTempoApiError as err:
             self.update_interval = API_RETRY_INTERVAL
-            _LOGGER.warning("EDF Tempo day colors refresh failed: %s", err)
+            _LOGGER.warning("EDF Tempo Rev TBE day colors refresh failed: %s", err)
             raise UpdateFailed(f"Unable to fetch Tempo day colors: {err}") from err
 
         season_refresh_failed = False
@@ -106,7 +106,7 @@ class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
                 self.config_entry.async_start_reauth(self.hass)
             season_summary = self._last_current_season_summary(previous_data)
             _LOGGER.warning(
-                "EDF Tempo season summary refresh failed; retrying in %s seconds: %s",
+                "EDF Tempo Rev TBE season summary refresh failed; retrying in %s seconds: %s",
                 int(API_RETRY_INTERVAL.total_seconds()),
                 err,
             )
@@ -138,7 +138,7 @@ class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
         else:
             self.update_interval = self._compute_next_update_interval(data, previous_data)
         _LOGGER.debug(
-            "EDF Tempo day colors refreshed: season_success=%s today=%s tomorrow=%s next_update_in=%ss",
+            "EDF Tempo Rev TBE day colors refreshed: season_success=%s today=%s tomorrow=%s next_update_in=%ss",
             not season_refresh_failed,
             data.today.color_code,
             data.tomorrow.color_code,
@@ -183,7 +183,7 @@ class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
     async def _async_get_current_season_summary(self, today, tomorrow):
         """Return the current season summary using cache-first logic."""
         _LOGGER.debug(
-            "Building current EDF Tempo season summary with today=%s tomorrow=%s",
+            "Building current EDF Tempo Rev TBE season summary with today=%s tomorrow=%s",
             today.color_code,
             tomorrow.color_code,
         )
@@ -216,7 +216,7 @@ class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
             # A closing card must not cancel a download shared with other callers.
             cache_entry = await asyncio.shield(task)
         else:
-            _LOGGER.debug("EDF Tempo season cache hit for %s", season_start_key)
+            _LOGGER.debug("EDF Tempo Rev TBE season cache hit for %s", season_start_key)
 
         if (
             season_start_year == self.current_season_start_year
@@ -234,7 +234,7 @@ class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
 
     async def _async_load_season(self, season_start: date, season_end: date) -> TempoSeasonCacheEntry:
         """Download and persist one missing season for all concurrent callers."""
-        _LOGGER.debug("EDF Tempo season cache miss for %s", season_start)
+        _LOGGER.debug("EDF Tempo Rev TBE season cache miss for %s", season_start)
         day_colors = await self.client.async_get_season_day_colors(season_start, season_end)
         entry = build_cache_entry(season_start.isoformat(), season_end.isoformat(), day_colors)
         await self._season_cache.async_set(entry)
@@ -275,7 +275,7 @@ class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
         )
         if overnight_interval is not None:
             _LOGGER.debug(
-                "EDF Tempo next update scheduled in overnight window: %ss",
+                "EDF Tempo Rev TBE next update scheduled in overnight window: %ss",
                 int(overnight_interval.total_seconds()),
             )
             return overnight_interval
@@ -289,7 +289,7 @@ class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
         )
         if midday_interval is not None:
             _LOGGER.debug(
-                "EDF Tempo next update scheduled in midday window: %ss",
+                "EDF Tempo Rev TBE next update scheduled in midday window: %ss",
                 int(midday_interval.total_seconds()),
             )
             return midday_interval
@@ -301,7 +301,7 @@ class EdfTempoDataUpdateCoordinator(DataUpdateCoordinator[TempoCalendarData]):
         )
         next_interval = max(next_midnight - now, timedelta(minutes=1))
         _LOGGER.debug(
-            "EDF Tempo next update scheduled for next overnight window in %ss",
+            "EDF Tempo Rev TBE next update scheduled for next overnight window in %ss",
             int(next_interval.total_seconds()),
         )
         return next_interval

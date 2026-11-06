@@ -1,4 +1,4 @@
-"""Season summary caching for EDF Tempo."""
+"""Season summary caching for EDF Tempo Rev TBE."""
 
 from __future__ import annotations
 
@@ -43,13 +43,13 @@ class EdfTempoSeasonCache:
         try:
             stored = await self._store.async_load()
         except (OSError, TypeError, ValueError) as err:
-            _LOGGER.warning("Ignoring unreadable EDF Tempo season cache: %s", err)
+            _LOGGER.warning("Ignoring unreadable EDF Tempo Rev TBE season cache: %s", err)
             self._data = {}
             return
 
         if not isinstance(stored, dict):
             if stored is not None:
-                _LOGGER.warning("Ignoring invalid EDF Tempo season cache structure")
+                _LOGGER.warning("Ignoring invalid EDF Tempo Rev TBE season cache structure")
             self._data = {}
             return
 
@@ -62,10 +62,10 @@ class EdfTempoSeasonCache:
         invalid_entries = len(stored) - len(self._data)
         if invalid_entries:
             _LOGGER.warning(
-                "Ignored %s invalid EDF Tempo season cache entries",
+                "Ignored %s invalid EDF Tempo Rev TBE season cache entries",
                 invalid_entries,
             )
-        _LOGGER.debug("Loaded EDF Tempo season cache with %s entries", len(self._data))
+        _LOGGER.debug("Loaded EDF Tempo Rev TBE season cache with %s entries", len(self._data))
 
     def get(self, season_start: str) -> TempoSeasonCacheEntry | None:
         """Return a cached season entry."""
@@ -95,7 +95,7 @@ class EdfTempoSeasonCache:
         """Clear cached seasons from memory and Home Assistant storage."""
         self._data.clear()
         await self._store.async_remove()
-        _LOGGER.debug("Cleared EDF Tempo season cache")
+        _LOGGER.debug("Cleared EDF Tempo Rev TBE season cache")
 
     async def async_set(self, entry: TempoSeasonCacheEntry) -> None:
         """Persist a season entry."""
@@ -106,7 +106,7 @@ class EdfTempoSeasonCache:
         }
         await self._store.async_save(self._data)
         _LOGGER.debug(
-            "Saved EDF Tempo season cache entry for %s with %s known days",
+            "Saved EDF Tempo Rev TBE season cache entry for %s with %s known days",
             entry.summary.season_start,
             len(entry.day_colors),
         )
@@ -146,7 +146,7 @@ class EdfTempoSeasonCache:
         )
         await self.async_set(updated_entry)
         _LOGGER.debug(
-            "Updated current EDF Tempo season cache for %s",
+            "Updated current EDF Tempo Rev TBE season cache for %s",
             entry.summary.season_start,
         )
         return updated_entry

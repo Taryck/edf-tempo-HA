@@ -1,4 +1,4 @@
-"""Config flow for the EDF Tempo integration."""
+"""Config flow for the EDF Tempo Rev TBE integration."""
 
 from __future__ import annotations
 
@@ -51,7 +51,7 @@ def _reconfigure_schema(client_id: str) -> vol.Schema:
 
 
 class EdfTempoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for EDF Tempo."""
+    """Handle a config flow for EDF Tempo Rev TBE."""
 
     VERSION = 1
     MINOR_VERSION = 1
@@ -145,7 +145,7 @@ class EdfTempoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def _async_validate_input(self, data: dict[str, Any]) -> dict[str, str]:
-        """Validate user input against the EDF Tempo API."""
+        """Validate user input against the EDF Tempo Rev TBE API."""
         client = EdfTempoClient(
             session=async_get_clientsession(self.hass),
             client_id=data[CONF_CLIENT_ID],

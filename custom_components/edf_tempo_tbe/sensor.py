@@ -1,4 +1,4 @@
-"""Sensor platform for the EDF Tempo integration."""
+"""Sensor platform for the EDF Tempo Rev TBE integration."""
 
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ from .effective import EffectiveTempoTracker
 
 @dataclass(frozen=True, slots=True)
 class EdfTempoSensorEntityDescription(SensorEntityDescription):
-    """Describe an EDF Tempo sensor."""
+    """Describe an EDF Tempo Rev TBE sensor."""
 
     value_key: str = ""
 
@@ -101,19 +101,19 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up EDF Tempo sensors from a config entry."""
+    """Set up EDF Tempo Rev TBE sensors from a config entry."""
     coordinator: EdfTempoDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     # 3/4) Deux capteurs supplémentaires : couleur effective et origine de sa décision.
     tracker = EffectiveTempoTracker(hass, entry, coordinator)
     async_add_entities([
         *(EdfTempoSensor(coordinator, entry, description) for description in SENSORS),
-        EffectiveTempoSensor(tracker, entry, "edf_tempo"),
-        EffectiveTempoSensor(tracker, entry, "edf_tempo_source"),
+        EffectiveTempoSensor(tracker, entry, "edf_tempo_tbe"),
+        EffectiveTempoSensor(tracker, entry, "edf_tempo_tbe_source"),
     ])
 
 
 class EdfTempoSensor(CoordinatorEntity[EdfTempoDataUpdateCoordinator], SensorEntity):
-    """Representation of an EDF Tempo sensor."""
+    """Representation of an EDF Tempo Rev TBE sensor."""
 
     entity_description: EdfTempoSensorEntityDescription
     _attr_has_entity_name = True
@@ -295,7 +295,7 @@ class EffectiveTempoSensor(SensorEntity):
 
     @property
     def native_value(self) -> str | None:
-        return self.tracker.color if self.key == "edf_tempo" else self.tracker.source
+        return self.tracker.color if self.key == "edf_tempo_tbe" else self.tracker.source
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()

@@ -1,4 +1,4 @@
-"""WebSocket API for on-demand EDF Tempo season data."""
+"""WebSocket API for on-demand EDF Tempo Rev TBE season data."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def async_register(hass: HomeAssistant) -> None:
 
 @websocket_api.websocket_command(
     {
-        vol.Required("type"): "edf_tempo/get_season_calendar",
+        vol.Required("type"): "edf_tempo_tbe/get_season_calendar",
         vol.Required("season_start_year"): int,
     }
 )
@@ -35,26 +35,26 @@ async def ws_get_season_calendar(
 ) -> None:
     """Return day colors for a selected Tempo season."""
     _LOGGER.debug(
-        "Received EDF Tempo season calendar websocket request for season_start_year=%s",
+        "Received EDF Tempo Rev TBE season calendar websocket request for season_start_year=%s",
         msg["season_start_year"],
     )
     domain_data = hass.data.get(DOMAIN)
     if not domain_data:
-        _LOGGER.debug("EDF Tempo websocket request rejected because integration is not loaded")
-        connection.send_error(msg["id"], "not_loaded", "EDF Tempo is not loaded")
+        _LOGGER.debug("EDF Tempo Rev TBE websocket request rejected because integration is not loaded")
+        connection.send_error(msg["id"], "not_loaded", "EDF Tempo Rev TBE is not loaded")
         return
 
     coordinator = domain_data.get(DATA_COORDINATOR)
     if coordinator is None or not isinstance(coordinator, EdfTempoDataUpdateCoordinator):
-        _LOGGER.debug("EDF Tempo websocket request rejected because coordinator was not found")
-        connection.send_error(msg["id"], "not_loaded", "EDF Tempo coordinator not found")
+        _LOGGER.debug("EDF Tempo Rev TBE websocket request rejected because coordinator was not found")
+        connection.send_error(msg["id"], "not_loaded", "EDF Tempo Rev TBE coordinator not found")
         return
 
     season_start_year = msg["season_start_year"]
     current_season_start_year = coordinator.current_season_start_year
     if season_start_year < MIN_SEASON_START_YEAR or season_start_year > current_season_start_year:
         _LOGGER.debug(
-            "EDF Tempo websocket request rejected for out-of-range season_start_year=%s",
+            "EDF Tempo Rev TBE websocket request rejected for out-of-range season_start_year=%s",
             season_start_year,
         )
         connection.send_error(msg["id"], "invalid_season", "Season out of allowed range")
@@ -64,14 +64,14 @@ async def ws_get_season_calendar(
         season_entry = await coordinator.async_get_season_entry(season_start_year)
     except EdfTempoAuthError:
         _LOGGER.warning(
-            "EDF Tempo websocket season fetch failed due to authentication for season_start_year=%s",
+            "EDF Tempo Rev TBE websocket season fetch failed due to authentication for season_start_year=%s",
             season_start_year,
         )
-        connection.send_error(msg["id"], "auth_failed", "EDF Tempo authentication failed")
+        connection.send_error(msg["id"], "auth_failed", "EDF Tempo Rev TBE authentication failed")
         return
     except EdfTempoApiError as err:
         _LOGGER.warning(
-            "EDF Tempo websocket season fetch failed for season_start_year=%s: %s",
+            "EDF Tempo Rev TBE websocket season fetch failed for season_start_year=%s: %s",
             season_start_year,
             err,
         )
@@ -79,14 +79,14 @@ async def ws_get_season_calendar(
         return
     except Exception:
         _LOGGER.exception(
-            "Unexpected EDF Tempo websocket error for season_start_year=%s",
+            "Unexpected EDF Tempo Rev TBE websocket error for season_start_year=%s",
             season_start_year,
         )
-        connection.send_error(msg["id"], "unknown_error", "Unexpected EDF Tempo error")
+        connection.send_error(msg["id"], "unknown_error", "Unexpected EDF Tempo Rev TBE error")
         return
 
     _LOGGER.debug(
-        "Serving EDF Tempo season calendar websocket response for season_start_year=%s with %s known days",
+        "Serving EDF Tempo Rev TBE season calendar websocket response for season_start_year=%s with %s known days",
         season_start_year,
         len(season_entry.day_colors),
     )

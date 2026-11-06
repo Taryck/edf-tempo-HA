@@ -1,6 +1,6 @@
 {
-  "domain": "edf_tempo",
-  "name": "EDF Tempo",
+  "domain": "edf_tempo_tbe",
+  "name": "EDF Tempo Rev TBE",
   "codeowners": ["@andry-paris"],
   "config_flow": true,
   "dependencies": ["http", "lovelace"],

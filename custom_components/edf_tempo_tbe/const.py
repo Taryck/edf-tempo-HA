@@ -1,17 +1,17 @@
-"""Constants for the EDF Tempo integration."""
+"""Constants for the EDF Tempo Rev TBE integration."""
 
 from __future__ import annotations
 
 from datetime import time
 from zoneinfo import ZoneInfo
 
-DOMAIN = "edf_tempo"
+DOMAIN = "edf_tempo_tbe"
 MIN_SEASON_START_YEAR = 2015
 DATA_COORDINATOR = "coordinator"
 
 CARD_FILENAME = "card.js"
-CARD_URL_PATH = "/edf_tempo/card.js"
-LEGACY_CARD_URL_PATH = "/local/edf_tempo/card.js"
+CARD_URL_PATH = "/edf_tempo_tbe/card.js"
+LEGACY_CARD_URL_PATH = "/local/edf_tempo_tbe/card.js"
 INTEGRATION_VERSION = "1.2.12"
 
 CONF_CLIENT_ID = "client_id"
@@ -28,7 +28,7 @@ DEFAULT_LIXEE_LOCK_HOURS = 12
 
 PLATFORMS = ["sensor"]
 
-DEFAULT_NAME = "EDF Tempo"
+DEFAULT_NAME = "EDF Tempo Rev TBE"
 
 TOKEN_URL = "https://digital.iservices.rte-france.com/token/oauth/"
 API_BASE_URL = "https://digital.iservices.rte-france.com"

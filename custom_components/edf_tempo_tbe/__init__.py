@@ -1,4 +1,4 @@
-"""The EDF Tempo integration."""
+"""The EDF Tempo Rev TBE integration."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ CLEAR_CACHE_SERVICE = "clear_cache"
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Set up the EDF Tempo integration."""
+    """Set up the EDF Tempo Rev TBE integration."""
     hass.data.setdefault(DOMAIN, {})
     await async_register_frontend(hass)
     if not hass.data[DOMAIN].get("_websocket_registered"):
@@ -34,7 +34,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up EDF Tempo from a config entry."""
+    """Set up EDF Tempo Rev TBE from a config entry."""
     hass.data.setdefault(DOMAIN, {})
     # Retry Lovelace registration here in case its resource collection was not
     # ready during the integration's global setup.
@@ -72,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload an EDF Tempo config entry."""
+    """Unload an EDF Tempo Rev TBE config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
         entry.async_unload()
