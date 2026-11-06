@@ -60,6 +60,9 @@ class EffectiveTempoTracker:
         self._unsub_switch = None
         self._started = False
         self._pending = False
+        self._rte_decision = None
+        self._lixee_first = None
+        self._unsub_lixee = None
 
     def subscribe(self, listener):
         self._listeners.add(listener)
@@ -89,7 +92,7 @@ class EffectiveTempoTracker:
             return None
         for item in (data.today, data.tomorrow):
             if item.date == day.isoformat():
-                return COLORS.get(item.color_code)
+                return {"BLUE": "Bleu", "WHITE": "Blanc", "RED": "Rouge"}.get(item.color_code)
         return None
 
     def _set(self, color, source):
@@ -97,55 +100,101 @@ class EffectiveTempoTracker:
             self.color, self.source = color, source
             self._notify()
 
+    def rte_est_hs(self, jour):
+        """À 04:00 : absence de couleur RTE datée = secours Lixee pour ce jour."""
+        return self._rte_color(jour) is None
+
+    def _surveiller_lixee(self):
+        """À 05:00 : écouter simultanément les 2 x X capteurs LTARF/NTARF."""
+        if self._unsub_lixee is not None:
+            return
+        entities = self.entry.options.get(CONF_LIXEE_ENTITIES, [])
+        if entities:
+            self._unsub_lixee = async_track_state_change_event(
+                self.hass, entities, self._on_lixee_change)
+
+    def _arreter_lixee(self):
+        if self._unsub_lixee is not None:
+            self._unsub_lixee()
+            self._unsub_lixee = None
+
+    def _decider_rte(self, jour):
+        """À 04:00, figer le choix RTE/Lixee jusqu'au lendemain."""
+        self._rte_decision = (jour, None if self.rte_est_hs(jour) else self._rte_color(jour))
+        self._lixee_first = None
+        self._lock_until = None
+        if self._rte_decision[1] is not None:
+            self._arreter_lixee()
+
     def _apply_day(self):
+        """À 06:00 : appliquer la décision de 04:00, sans consulter RTE à nouveau."""
         now = datetime.now(PARIS_TIME_ZONE)
-        day = self._current_day(now)
-        if day != self._day:
-            self._day = day
-            self._lock_until = None
-            # 3) Pas de couleur RTE pour ce jour : unknown, jamais l'ancienne couleur.
-            color = self._rte_color(day)
-            self._pending = color is None
-            self._set(color, RTE if color else None)
-        elif self._pending:
-            # Une annonce RTE tardive reprend toujours la priorité.
-            color = self._rte_color(day)
-            if color:
-                self._pending = False
-                self._set(color, RTE)
+        jour = self._current_day(now)
+        if self._day == jour:
+            return
+        self._day = jour
+        if self._rte_decision is None or self._rte_decision[0] != jour:
+            # Redémarrage après 04:00 : impossible de reconstituer la décision passée.
+            self._set(None, None)
+            return
+        couleur_rte = self._rte_decision[1]
+        if couleur_rte is not None:
+            self._set(couleur_rte, RTE)
+        elif self._lixee_first is not None:
+            self._set(self._lixee_first[1], LIXEE)
+        else:
+            self._set(None, None)
 
     @callback
     def _on_rte_update(self):
-        self._apply_day()
+        # RTE est ignoré après la décision de 04:00 pour la journée en cours.
+        pass
 
     @callback
     def _on_lixee_change(self, event):
-        if not self._pending:
-            return
+        """Retenir le premier événement valide reçu depuis 05:00, tous Lixee confondus."""
         now = datetime.now(PARIS_TIME_ZONE)
-        # 2) Seuls les changements détectés à partir de la bascule sont recevables.
-        if self._current_day(now) != now.date():
+        if self._rte_decision is None or self._rte_decision != (now.date(), None):
             return
         if self._lock_until is not None and now < self._lock_until:
             return
-        old = lixee_color(event.data.get("old_state"))
-        new = lixee_color(event.data.get("new_state"))
-        if old is None or new is None or old == new:
+        ancien = lixee_color(event.data.get("old_state"))
+        nouveau = lixee_color(event.data.get("new_state"))
+        if nouveau is None or ancien == nouveau:
             return
-        self._set(new, LIXEE)
-        self._lock_until = now + timedelta(hours=int(self.entry.options.get(
-            CONF_LIXEE_LOCK_HOURS, DEFAULT_LIXEE_LOCK_HOURS)))
+        # La date est celle de l'événement reçu, jamais celle de la dernière valeur.
+        if self._lixee_first is None:
+            self._lixee_first = (now, nouveau)
+        if self._current_day(now) == now.date():
+            self._apply_day()
+            self._set(nouveau, LIXEE)
+            self._lock_until = now + timedelta(hours=int(self.entry.options.get(
+                CONF_LIXEE_LOCK_HOURS, DEFAULT_LIXEE_LOCK_HOURS)))
 
     @callback
     def _on_switch(self, _now):
-        self._apply_day()
+        now = datetime.now(PARIS_TIME_ZONE)
+        bascule = datetime.combine(now.date(), self._switch_time(), tzinfo=PARIS_TIME_ZONE)
+        if now < bascule - timedelta(hours=1):
+            # 04:00 : décider RTE ou Lixee, puis oublier RTE jusqu'au lendemain.
+            self._decider_rte(now.date())
+        elif now < bascule:
+            # 05:00 : écouter les changements des 2 x X capteurs uniquement si RTE HS.
+            if self._rte_decision == (now.date(), None):
+                self._surveiller_lixee()
+        else:
+            # 06:00 : publier la couleur décidée.
+            self._apply_day()
         self._schedule_next()
 
     def _schedule_next(self):
         now = datetime.now(PARIS_TIME_ZONE)
-        target = datetime.combine(now.date(), self._switch_time(), tzinfo=PARIS_TIME_ZONE)
-        if target <= now:
-            target = datetime.combine(now.date() + timedelta(days=1), self._switch_time(), tzinfo=PARIS_TIME_ZONE)
+        bascule = datetime.combine(now.date(), self._switch_time(), tzinfo=PARIS_TIME_ZONE)
+        horaires = (bascule - timedelta(hours=2), bascule - timedelta(hours=1), bascule)
+        target = next((instant for instant in horaires if instant > now), None)
+        if target is None:
+            bascule = datetime.combine(now.date() + timedelta(days=1), self._switch_time(), tzinfo=PARIS_TIME_ZONE)
+            target = bascule - timedelta(hours=2)
         if self._unsub_switch is not None:
             self._unsub_switch()
         self._unsub_switch = async_track_point_in_time(self.hass, self._on_switch, target)
@@ -155,12 +204,7 @@ class EffectiveTempoTracker:
             return
         self._started = True
         self._apply_day()
-        self._unsub.append(self.coordinator.async_add_listener(self._on_rte_update))
-        # 2) N entités LTARF et NTARF, la première bascule de couleur l'emporte.
-        entities = self.entry.options.get(CONF_LIXEE_ENTITIES, [])
-        if entities:
-            self._unsub.append(async_track_state_change_event(
-                self.hass, entities, self._on_lixee_change))
+        # 04:00 est la seule décision RTE ; les mises à jour ultérieures sont ignorées.
         self._schedule_next()
 
     async def async_stop_if_unused(self):
@@ -169,6 +213,7 @@ class EffectiveTempoTracker:
         for unsub in self._unsub:
             unsub()
         self._unsub.clear()
+        self._arreter_lixee()
         if self._unsub_switch is not None:
             self._unsub_switch()
             self._unsub_switch = None
